@@ -1,30 +1,44 @@
 version: "2"
-
 services:
+
+
+
   # WEB-SERVER
   nginx:
-    build: ./nginx/
+    build: ./nginx_dockerfile/
     ports:
-        - 80:80
+        - 8000:80
     links:
         - php
     volumes_from:
         - app-volume
+    container_name: nginx-webserver-container
+
+
+
+
   # PHP language
   php:
-    build: ./php/
+    build: ./php_dockerfile/
     expose:
         - 9000
     links:
-      - mysql
+        - mysql
     volumes_from:
         - app-volume
+    container_name: php-container
+
+
+
   # app- volumes
   app-volume:
     image: php:7.0-fpm
     volumes:
-        - .:/var/www/html
+        - .:/usr/share/nginx/html
     command: "true"
+
+
+
   # mysql
   mysql:
     image: mysql:latest
@@ -35,20 +49,29 @@ services:
         MYSQL_DATABASE: project
         MYSQL_USER: project
         MYSQL_PASSWORD: project
+    container_name: mysql-container
+
+
+
   # acess container mysql
   # docker exec -it CONTAINER_ID /bin/bash
+
   # mysql storage volume
   data:
     image: mysql:latest
     volumes:
         - /var/lib/mysql
     command: "true"
-  #phpadmin  
+
+
+
+  #phpadmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-        - 8080:80
+        - 7000:80
     links:
         - mysql
     environment:
         PMA_HOST: mysql
+    container_name: phpmyadmin-container
