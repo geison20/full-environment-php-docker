@@ -1,9 +1,54 @@
-version: '2'
+version: "2"
 
 services:
-
-  server-web:
-    image: nginx
+  # WEB-SERVER
+  nginx:
+    build: ./nginx/
     ports:
-      - "8000:80"
-    container_name: server_web_nginx
+        - 80:80
+    links:
+        - php
+    volumes_from:
+        - app-volume
+  # PHP language
+  php:
+    build: ./php/
+    expose:
+        - 9000
+    links:
+      - mysql
+    volumes_from:
+        - app-volume
+  # app- volumes
+  app-volume:
+    image: php:7.0-fpm
+    volumes:
+        - .:/var/www/html
+    command: "true"
+  # mysql
+  mysql:
+    image: mysql:latest
+    volumes_from:
+        - data
+    environment:
+        MYSQL_ROOT_PASSWORD: secret
+        MYSQL_DATABASE: project
+        MYSQL_USER: project
+        MYSQL_PASSWORD: project
+  # acess container mysql
+  # docker exec -it CONTAINER_ID /bin/bash
+  # mysql storage volume
+  data:
+    image: mysql:latest
+    volumes:
+        - /var/lib/mysql
+    command: "true"
+  #phpadmin  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+        - 8080:80
+    links:
+        - mysql
+    environment:
+        PMA_HOST: mysql
