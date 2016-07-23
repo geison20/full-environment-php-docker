@@ -5,9 +5,9 @@ services:
 
   # WEB-SERVER
   nginx:
-    build: ./nginx_dockerfile/
+    image: geison200/nginx_dockerfile
     ports:
-        - 8000:80
+        - 80:80
     links:
         - php
     volumes_from:
@@ -17,9 +17,9 @@ services:
 
 
 
-  # PHP language
+  # PHP
   php:
-    build: ./php_dockerfile/
+    image: geison200/php_dockerfile
     expose:
         - 9000
     links:
@@ -32,23 +32,30 @@ services:
 
   # app- volumes
   app-volume:
-    image: php:7.0-fpm
+    image: geison200/php_dockerfile
     volumes:
         - .:/usr/share/nginx/html
     command: "true"
+    container_name: app-volume
 
 
 
   # mysql
   mysql:
-    image: mysql:latest
+    image: mysql:5.7
+    ports:
+        - 3306:3306
     volumes_from:
         - data
     environment:
-        MYSQL_ROOT_PASSWORD: secret
-        MYSQL_DATABASE: project
-        MYSQL_USER: project
-        MYSQL_PASSWORD: project
+        # use para setar uma senha para o usuario root
+        MYSQL_ROOT_PASSWORD: 12345
+        # cria um schema incial
+        MYSQL_DATABASE: docker_schema
+        # crie um usuario diferente de root
+        #MYSQL_USER: admin
+        # de um password para esse usuario
+        #MYSQL_PASSWORD: 12345
     container_name: mysql-container
 
 
@@ -58,11 +65,11 @@ services:
 
   # mysql storage volume
   data:
-    image: mysql:latest
+    image: mysql:5.7
     volumes:
-        - /var/lib/mysql
+        - "./data/db-mysql:/var/lib/mysql"
     command: "true"
-
+    container_name: mysql-volume
 
 
   #phpadmin
